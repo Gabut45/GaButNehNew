@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical"
+    android:id="@+id/parentLyt"
+    tools:context=".activities.GameActivity">
+
+    <include
+        android:id="@+id/layoutProfile"
+        layout="@layout/layout_profile"/>
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_below="@+id/layoutProfile"
+        android:layout_above="@+id/bannerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_5sdp"/>
+
+    <include
+        android:id="@+id/bannerLayout"
+        layout="@layout/layout_banner_ads"/>
+
+</RelativeLayout>

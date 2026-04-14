@@ -1,0 +1,101 @@
+<resources>
+    <!--    // Need To Change-->
+    <string name="app_name">GaBut</string>
+    <string name="client_id">821495368257-n0ab878uhrvq453nestldn0a17b0jars.apps.googleusercontent.com</string>
+    <string name="onesignal_app_id">53033e77-5b66-4237-a378-23812e82a6ed</string>
+    <!--    // Need To Change-->
+
+    <!--TODO Text For Bottom Navigation Bar-->
+    <string name="home">Home</string>
+    <string name="leaderboard">Peringkat</string>
+    <string name="refer">Undang</string>
+    <string name="rewards">Kirim</string>
+    <string name="profile">Profile</string>
+    <string name="text_spin">Putar</string>
+    <string name="text_offers">Offers</string>
+    <string name="text_games">Games</string>
+    <string name="text_task">Tugas</string>
+
+    <!--TODO If you want to change below values, You need to also change on admin panel file inside messages.php-->
+    <string name="redeem_text">redeem</string>
+    <string name="spin_text">Putar Roda</string>
+    <string name="game_text">Main Game</string>
+    <string name="task_text">Tugas</string>
+    <string name="iklan_text">Nonton Iklan</string>
+    <string name="iklanlis_text">Nonton Iklan Game</string>
+
+    <string name="btn_profile_text">Profil Saya</string>
+    <string name="msg_no_spin_available">Anda tidak memiliki kesempatan spin tersedia.</string>
+
+    <string name="text_coins">berlian</string>
+    <string name="text_profile">Profile</string>
+    <string name="text_transactions">Riwayat</string>
+    <string name="text_transactions_desc">Lihat Asal berlian</string>
+    <string name="text_contact_us">Kontak</string>
+    <string name="text_contact_desc">Hubungi Kami</string>
+    <string name="text_privacy_policy">Kebijakan Privasi</string>
+    <string name="text_privacy_policy_desc">Baca Kebijakan Kami</string>
+    <string name="text_terms_condition"><![CDATA[Syarat & Ketentuan]]></string>
+    <string name="text_terms_condition_desc"><![CDATA[Baca Semua Ketentuan]]></string>
+    <string name="text_rate_us">Privasi Lainnya</string>
+    <string name="text_rate_us_desc">Privasi Pihak Ke 3</string>
+    <string name="text_logout_desc">Keluar Akun</string>
+    <string name="text_logout">Keluar</string>
+    <string name="text_today_offers">Today Offers</string>
+    <string name="text_view_all">Game Lainnya</string>
+    <string name="msg_please_wait">Please Wait.</string>
+    <string name="msg_phone_state_permission">Permission required for registration.</string>
+    <string name="msg_no_internet">No Internet!</string>
+    <string name="msg_no_internet_desc">Please check your internet connection.</string>
+    <string name="no_internet_desc"><![CDATA[No Internet Connection, Please check your Internet Connection & click on the Retry button.]]></string>
+    <string name="msg_please_try_again_later">Please try again later.</string>
+    <string name="msg_referral_notice">Jika kamu tidak punya kode undangan, silahkan klik tombol \'Lewati\' di bawah ini.</string>
+    <string name="edit_text_enter_referral_code">Masukkan Kode Undanganmu</string>
+    <string name="text_referral">Bonus Undang Teman</string>
+    <string name="msg_please_enter_refferal_code">Tolong Masukkan kode Undanganmu</string>
+    <string name="msg_congratulations">Selamat Ya!</string>
+    <string name="msg_you_got">Anda Mendapatkan</string>
+    <string name="btn_ok_thanks">OKE</string>
+    <string name="text_insufficient">Waktu Masih Kurang Nih!</string>
+    <string name="text_insufficient_time">Waktu Masih Kurang Nih!</string>
+    <string name="text_insufficient_coins">Insufficient Coins</string>
+    <string name="btn_cancel">Batalkan</string>
+    <string name="btn_confirm">Konfirmasi</string>
+    <string name="btn_iklan">Tonton Iklan</string>
+    <string name="msg_package_not_found">Package Not Found.</string>
+    <string name="msg_rooted_device">Oops! Your device is rooted.</string>
+    <string name="msg_device_emulator">Oops! Your device is an emulator.</string>
+    <string name="msg_go_back"><![CDATA[Klik kembali & dapatkan coinnya.]]></string>
+    <string name="text_method">Method</string>
+    <string name="text_redeem">Tukar Berlian</string>
+    <string name="text_redeem_desc">Masukkan detai penukaran berlian ke dalam kotak di bawah ini.\nEstimasi terkirim dalam waktu 2 jam.</string>
+    <string name="text_enter">Tuliskan Detailnya</string>
+    <string name="text_details">, Disini</string>
+    <string name="btn_submit">Submit</string>
+    <string name="text_redeem_notice">You\'ll receive notification once your payment is approved or rejected.</string>
+    <string name="enter_your_name">Masukkan Nama Kamu</string>
+    <string name="text_update_profile">Ubah Nama Profil</string>
+    <string name="text_update_profile_desc">Masukkan namamu ke daklam kotak di bawah ini.\n⚠️ Harap gunakan nama sopan &amp; tidak mengandung unsur SARA, vulgar, atau nama merek/game terkenal.\nPelanggaran akan di BLOKIR PERMANEN.</string>
+    <string name="msg_something_went_wrong">Something Went wrong.</string>
+    <string name="text_spin_available">Putaran Tersedia</string>
+    <string name="msg_vpn_title">VPN Detected!</string>
+    <string name="msg_vpn_desc">Please Disconnect The VPN Service and then Use it.</string>
+    <string name="btn_skip">Lewati</string>
+
+    <!--IKI GAWENANKU SENG NANG LEADERBORD-->
+    <string name="spiniklan">\n\nIngin 500 berlian tambahan?\nTONTON IKLAN hingga selesai.</string>
+    <string name="iklanlis">\n\nIngin 300 berlian tambahan?\nTONTON IKLAN hingga selesai.</string>
+    <string name="kiwo">kiwo</string>
+    <string name="tengen">tengen</string>
+    <string name="teks_login"><![CDATA[
+    Dengan mengklik LOGIN / SIGN IN, Anda mengkonfirmasi bahwa Anda setidaknya telah berusia 14 tahun atau lebih.<br/>
+    Anda telah membaca dan menyetujui <a href="https://example.com/syarat">Syarat Penggunaan</a> kami.<br/>
+    Untuk mengetahui lebih lanjut tentang kebijakan privasi kami, buka <a href="https://example.com/kebijakan">Kebijakan Privasi</a> kami.<br/>
+    Game-game yang terdapat di dalam aplikasi ini disediakan oleh pihak ketiga.<br/>
+    Anda dapat melihat informasi dan kebijakan privasi mereka <a href="https://example.com/pihak-ketiga">Di Sini</a>.<br/>
+    Atau bisa juga di halaman PROFIL yang ada di dalam aplikasi ini.
+]]></string>
+
+
+
+</resources>

@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="230dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/redeemLyt"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_redeem_item">
+
+        <TextView
+            android:id="@+id/redeemPaymentMethod"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="@dimen/_100sdp"
+            android:gravity="bottom|center_horizontal"
+            android:maxLines="2"
+            android:paddingBottom="5dp"
+            android:paddingEnd="31dp"
+            android:paddingStart="31dp"
+            android:rotation="45"
+            android:text="Method UPI"
+            android:textAllCaps="true"
+            android:textColor="@android:color/white"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:translationX="65dp"
+            android:translationY="-65dp"
+            android:background="@drawable/bg_btn_secondary"
+            android:layout_alignParentEnd="true" />
+
+        <ImageView
+            android:id="@+id/redeemCoinImage"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/redeem_coin"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:layout_marginLeft="@dimen/_20sdp"
+            android:layout_marginRight="@dimen/_20sdp"
+            android:adjustViewBounds="true"/>
+
+
+        <LinearLayout
+            android:id="@+id/coinLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/redeemCoinImage"
+            android:layout_centerHorizontal="true"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/coin"
+                android:adjustViewBounds="true"/>
+
+            <TextView
+                android:id="@+id/redeemCoinText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="5000"
+                android:textStyle="bold"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textSize="14sp"/>
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/redeemDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="5000 coins = ₹20"
+            android:textAlignment="center"
+            android:textStyle="normal"
+            android:layout_below="@id/coinLayout"
+            android:textColor="@color/desc_color"
+            android:textSize="@dimen/_10sdp"/>
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/withdrawBtn"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_30sdp"
+            android:text="Get ₹20"
+            android:textSize="@dimen/_9sdp"
+            android:layout_below="@+id/redeemDesc"
+            android:background="@drawable/bg_btn"
+            android:textColor="@color/white"
+            android:layout_marginVertical="@dimen/_5sdp"
+            android:layout_marginHorizontal="@dimen/_10sdp"/>
+
+    </RelativeLayout>
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="230dp"
+            android:background="@drawable/bg_redeem_item">
+
+            <TextView
+                android:id="@+id/paymentMethod"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="@dimen/_100sdp"
+                android:gravity="bottom|center_horizontal"
+                android:maxLines="2"
+                android:paddingBottom="5dp"
+                android:paddingEnd="31dp"
+                android:paddingStart="31dp"
+                android:rotation="45"
+                android:text=""
+                android:textAllCaps="true"
+                android:textColor="@android:color/white"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:translationX="65dp"
+                android:translationY="-65dp"
+                android:background="@drawable/bg_shimmer_effect_circle"
+                android:layout_alignParentEnd="true" />
+
+            <ImageView
+                android:id="@+id/coinImage"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_marginLeft="@dimen/_20sdp"
+                android:layout_marginRight="@dimen/_20sdp"
+                android:adjustViewBounds="true"
+                android:background="@drawable/bg_shimmer_effect_circle"/>
+
+
+            <LinearLayout
+                android:id="@+id/coin_layout"
+                android:layout_width="70dp"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_shimmer_effect_circle"
+                android:layout_below="@id/coinImage"
+                android:layout_centerHorizontal="true"
+                android:gravity="center_vertical"
+                android:layout_marginTop="@dimen/_5sdp">
+
+                <TextView
+                    android:id="@+id/coinText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:textAlignment="center"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/descText"
+                android:layout_width="120dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_shimmer_effect_circle"
+                android:textAlignment="center"
+                android:textStyle="normal"
+                android:layout_below="@id/coin_layout"
+                android:textColor="@color/desc_color"
+                android:textSize="@dimen/_10sdp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/redeemBtn"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_30sdp"
+                android:textSize="@dimen/_9sdp"
+                android:layout_below="@+id/descText"
+                android:background="@drawable/bg_shimmer_effect_circle"
+                android:textColor="@color/white"
+                android:layout_marginVertical="@dimen/_5sdp"
+                android:layout_marginHorizontal="@dimen/_10sdp"/>
+
+        </RelativeLayout>
+
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+</RelativeLayout>

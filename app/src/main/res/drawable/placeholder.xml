@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Background abu-abu muda -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#ECECEC" />
+        </shape>
+    </item>
+
+    <!-- Teks "Sedang memuat..." -->
+    <item>
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/loading_text" />
+    </item>
+</layer-list>

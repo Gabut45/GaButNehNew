@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/parentLyt"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical"
+    tools:context=".activities.RedeemHistoryActivity">
+
+    <!-- 🔹 Profil di atas -->
+    <include
+        android:id="@+id/layoutProfile"
+        layout="@layout/layout_profile" />
+
+    <!-- 🔹 RecyclerView daftar riwayat -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_below="@id/layoutProfile"
+        android:layout_above="@id/emptyLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/_10sdp"
+        android:layout_marginBottom="@dimen/_5sdp"
+        android:clipToPadding="false" />
+
+    <!-- 🔹 Layout kosong (muncul jika tidak ada data) -->
+    <LinearLayout
+        android:id="@+id/emptyLayout"
+        android:layout_below="@id/layoutProfile"
+        android:layout_above="@id/bannerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="24dp">
+
+        <ImageView
+            android:layout_width="90dp"
+            android:layout_height="90dp"
+            android:src="@drawable/ic_game"
+            app:tint="@color/white" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Belum ada riwayat penukaran"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- 🔹 Banner Ads di bawah -->
+    <include
+        android:id="@+id/bannerLayout"
+        layout="@layout/layout_banner_ads"
+        android:layout_alignParentBottom="true" />
+
+</RelativeLayout>

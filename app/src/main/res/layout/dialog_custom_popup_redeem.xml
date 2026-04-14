@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_popup"
+    android:padding="16dp"
+    tools:ignore="WebViewLayout">
+
+    <!-- Judul -->
+    <TextView
+        android:id="@+id/tvDialogTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#002F66"
+        android:gravity="center"
+        android:padding="16dp"
+        android:text="Q&amp;A TUKAR BERLIAN"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Konten Web -->
+    <WebView
+        android:id="@+id/webContent"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_marginTop="8dp" />
+
+    <!-- Email Info -->
+    <TextView
+        android:id="@+id/tvEmailInfo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#002F66"
+        android:gravity="center"
+        android:padding="16dp"
+        android:textColor="@android:color/white"
+        android:textSize="10sp"
+        android:textStyle="bold" />
+
+    <!-- Checkbox -->
+    <CheckBox
+        android:id="@+id/cbAgree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Saya telah membaca semuanya dan setuju"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="1dp"
+        android:layout_gravity="center_horizontal" />
+
+    <!-- Tombol Tutup -->
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tutup"
+        android:gravity="center"
+        android:layout_gravity="center_horizontal"
+        android:textColor="@android:color/white"
+        app:backgroundTint="@color/custom_red"
+        android:padding="12dp"
+        android:textSize="16sp"
+        android:layout_marginTop="1dp" />
+</LinearLayout>

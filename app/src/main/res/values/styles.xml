@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="PopupDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsFloating">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowAnimationStyle">@style/DialogAnimationCustom</item>
+    </style>
+
+    <style name="DialogAnimationCustom">
+        <item name="android:windowEnterAnimation">@anim/slide_in_from_bottom</item>
+        <item name="android:windowExitAnimation">@anim/slide_out_to_bottom</item>
+    </style>
+
+    <style name="Button.Cancel.Red" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/custom_red</item>
+        <item name="backgroundTint">@android:color/transparent</item>
+        <item name="android:textAllCaps">false</item> <!-- Supaya teks tidak jadi CAPS semua -->
+    </style>
+
+</resources>

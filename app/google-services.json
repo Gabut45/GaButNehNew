@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "821495368257",
+    "project_id": "ujicobagabut-13443",
+    "storage_bucket": "ujicobagabut-13443.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:821495368257:android:054d414bdd0b3b110e54c0",
+        "android_client_info": {
+          "package_name": "com.ujicoba.gabut"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "821495368257-ehsk1oic4pgpa398gbppa889762nsjk4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ujicoba.gabut",
+            "certificate_hash": "fdd5ca5405f3a959ce059611c49bf6784d23d452"
+          }
+        },
+        {
+          "client_id": "821495368257-n0ab878uhrvq453nestldn0a17b0jars.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwPwGpIVH45It9JS7zo0f9rxRZjqjqG58"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "821495368257-n0ab878uhrvq453nestldn0a17b0jars.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

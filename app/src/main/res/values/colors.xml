@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <color name="primaryColor">#7E2ACD</color>
+    <color name="primaryMidColor">#540083</color>
+    <color name="primaryDarkColor">#2c0043</color>
+
+    <color name="desc_color">#CCCBCB</color>
+
+    <color name="secondaryColor">#FF9819</color>
+    <color name="secondaryDarkColor">#DF7F07</color>
+
+    // Warna Gaweanku Dewe
+    <color name="ikonngisor">#0f3467</color>
+    <color name="ngisor">#020104</color>
+    <color name="custom_red">#D32F2F</color>
+    <color name="custom_kuning">#FF9819</color>
+    <color name="custom_ijo">#39ff14</color>
+
+</resources>

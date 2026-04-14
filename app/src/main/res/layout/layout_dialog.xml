@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:clickable="true"
+    android:gravity="center"
+    android:focusable="true">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/primaryDarkColor"
+        app:cardCornerRadius="@dimen/_10sdp">
+
+        <com.ujicoba.gabut.utils.SantaBlurView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/blurView"/>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="15dp">
+
+
+            <LinearLayout
+                android:id="@+id/top"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:background="@drawable/bg_dialog_icon"
+                android:layout_centerHorizontal="true"
+                android:padding="@dimen/_15sdp"
+                android:orientation="vertical">
+
+                <com.airbnb.lottie.LottieAnimationView
+                    android:id="@+id/lottieView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:lottie_autoPlay="true"
+                    app:lottie_loop="true"
+                    app:lottie_fileName="coin.json"/>
+
+                <ImageView
+                    android:id="@+id/imageView"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:visibility="gone"
+                    android:src="@drawable/redeem_coin"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="This is a title"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/white"
+                android:layout_marginTop="10dp"
+                android:layout_below="@id/top"
+                android:textSize="20sp"
+                android:textStyle="bold"/>
+
+            <LinearLayout
+                android:id="@+id/kotakdesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:textAlignment="center"
+                android:background="@drawable/btnmenubiru"
+                android:layout_below="@+id/title">
+
+                <TextView
+                    android:id="@+id/desc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="This is a short or long description"
+                    android:textColor="@color/white"
+                    android:textSize="14sp"
+                    android:gravity="center"
+                    android:textAlignment="center"
+                    android:padding="8dp"/>
+
+
+
+            </LinearLayout>
+
+
+
+
+            <LinearLayout
+                android:id="@+id/coinLyt"
+                android:layout_width="match_parent"
+                android:layout_height="35dp"
+                android:layout_below="@+id/kotakdesc"
+                android:layout_marginTop="10dp"
+                android:layout_centerVertical="true"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/dialog_coin_icon"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/coin"
+                    android:adjustViewBounds="true"/>
+
+                <TextView
+                    android:id="@+id/coins"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textStyle="bold"
+                    android:text="100"
+                    android:textColor="@color/white"
+                    android:textSize="20sp"
+                    android:paddingLeft="@dimen/_5sdp"/>
+
+            </LinearLayout>
+
+            <EditText
+                android:id="@+id/edit_text_1"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Edit Text 1"
+                android:textColorHint="@color/desc_color"
+                android:textColor="@color/white"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_below="@+id/coinLyt"
+                android:background="@drawable/bg_edit_text"/>
+
+            <EditText
+                android:id="@+id/edit_text_2"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:hint="Edit Text 2"
+                android:textColorHint="@color/desc_color"
+                android:textColor="@color/white"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:layout_marginTop="@dimen/_10sdp"
+                android:layout_below="@+id/edit_text_1"
+                android:background="@drawable/bg_edit_text"/>
+
+            <LinearLayout
+                android:id="@+id/btnLyt"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_below="@id/edit_text_2"
+                android:layout_marginTop="12dp"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <LinearLayout
+                    android:id="@+id/btn1"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:textColor="@color/white"
+                    android:background="@drawable/btnmenubiru"
+                    android:gravity="center_vertical"
+                    android:layout_marginEnd="5dp">
+
+                    <TextView
+                        android:id="@+id/btn1Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_cancel"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btn2"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:background="@drawable/btnmenuhijau"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:layout_marginStart="5dp">
+
+                    <TextView
+                        android:id="@+id/btn2Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_confirm"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/btniklan"
+                    android:layout_width="0dp"
+                    android:layout_height="50dp"
+                    android:layout_weight="1"
+                    android:textColor="@color/white"
+                    android:background="@drawable/btnmenubiru"
+                    android:gravity="center_vertical"
+                    android:orientation="vertical"
+                    android:layout_marginStart="5dp">
+
+                    <TextView
+                        android:id="@+id/btn3Text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/btn_iklan"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textSize="16sp"
+                        android:textColor="@color/white"/>
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    android:orientation="vertical"
+    android:padding="@dimen/_16sdp"
+    tools:context=".activities.LoginActivity">
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/logo_google"
+        android:visibility="gone" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="@dimen/_250sdp"
+        android:layout_height="@dimen/_70sdp"
+        android:layout_gravity="center"
+        android:layout_marginTop="@dimen/_200sdp"
+        android:background="@drawable/btn_google_sign_in" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/demo_login"
+        android:layout_width="@dimen/_250sdp"
+        android:layout_height="@dimen/_40sdp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:background="@drawable/bg_btn_secondary"
+        android:text="Demo Login"
+        android:textColor="@color/white"
+        android:textStyle="bold" />
+
+    <!-- Scrollable box untuk teks kebijakan -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginTop="@dimen/_100sdp"
+        android:layout_marginBottom="@dimen/_10sdp"
+        android:background="#22000000"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_kebijakan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:autoLink="none"
+            android:lineSpacingExtra="4dp"
+            android:linksClickable="true"
+            android:text="@string/teks_login"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/_10sdp" />
+    </ScrollView>
+
+    <!-- Checkbox konfirmasi -->
+    <CheckBox
+        android:id="@+id/checkbox_agree"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Saya telah membaca dan menyetujui semuanya"
+        android:textColor="@color/white"
+        android:textSize="@dimen/_10sdp" />
+
+</LinearLayout>

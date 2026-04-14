@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="80dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <RelativeLayout
+        android:id="@+id/trans_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_task_hr"
+        android:paddingHorizontal="@dimen/_10sdp">
+
+
+
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/trans_icon"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_centerVertical="true"
+            app:lottie_autoPlay="true"
+            app:lottie_fileName="coin.json"
+            app:lottie_loop="true"
+            app:riv_corner_radius="10dp"/>
+
+        <LinearLayout
+            android:id="@+id/lay"
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/trans_icon"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingLeft="15dp">
+
+            <TextView
+                android:id="@+id/trans_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="Santa Reward"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/trans_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Register and Deposit 50 Rs to get 99 coins"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/custom_ijo"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_icon_squre">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/coin" />
+
+            <TextView
+                android:id="@+id/trans_coin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="99"
+                android:textColor="@color/white"
+                android:textSize="14sp" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <include
+        android:id="@+id/shimmer_layout"
+        layout="@layout/layout_shimmer"/>
+
+</RelativeLayout>

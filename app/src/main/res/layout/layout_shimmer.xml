@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.facebook.shimmer.ShimmerFrameLayout android:layout_width="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="80dp"
+    android:id="@+id/shimmer_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <RelativeLayout android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@drawable/bg_task_hr"
+        android:paddingHorizontal="@dimen/_10sdp">
+
+        <com.makeramen.roundedimageview.RoundedImageView
+            android:id="@+id/task_icon"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_shimmer_effect"
+            app:riv_corner_radius="10dp" />
+
+        <LinearLayout
+            android:id="@+id/lay"
+            android:layout_width="210dp"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@+id/task_icon"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:paddingLeft="15dp">
+
+            <TextView
+                android:id="@+id/task_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:background="@drawable/bg_shimmer_effect"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
+
+            <TextView
+                android:id="@+id/task_desc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:background="@drawable/bg_shimmer_effect"
+                android:textColor="@color/desc_color"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="55dp"
+            android:layout_height="55dp"
+            android:layout_alignParentEnd="true"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:background="@drawable/bg_icon_squre">
+
+            <ImageView
+                android:id="@+id/coinIcon"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/bg_shimmer_effect"/>
+
+            <TextView
+                android:id="@+id/task_coin"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+                android:textStyle="bold"
+                android:background="@drawable/bg_shimmer_effect"
+                android:textColor="@color/white"
+                android:layout_marginTop="4dp"
+                android:textAlignment="center"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+
+
+    </RelativeLayout>
+
+
+</com.facebook.shimmer.ShimmerFrameLayout>

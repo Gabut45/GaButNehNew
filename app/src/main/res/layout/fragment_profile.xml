@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/bg"
+    tools:context=".fragments.ProfileFragment">
+
+    <include
+        android:id="@+id/profileLayout"
+        layout="@layout/layout_profile"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/profileLayout"
+        android:layout_marginBottom="@dimen/_70sdp">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:id="@+id/deleteLyt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="@dimen/_10sdp">
+
+
+
+                <RelativeLayout
+                    android:id="@+id/deleteAccountBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item"
+                    android:layout_marginHorizontal="@dimen/_5sdp">
+
+                    <ImageView
+                        android:id="@+id/deleteIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/hapus"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/deleteText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hapus Akun"
+                        android:layout_below="@id/deleteIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Hati-hati sebelum kamu menghapus akun"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/deleteText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyt1"
+                android:layout_below="@+id/deleteLyt"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="@dimen/_10sdp">
+
+                <RelativeLayout
+                    android:id="@+id/rateUs"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/rateIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_rate"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/rateText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_rate_us"
+                        android:layout_below="@id/rateIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/rateDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_rate_us_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/rateText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/transaction"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/walletIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_wallet"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/transText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_transactions"
+                        android:layout_below="@id/walletIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/descText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_transactions_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/transText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/contactUs"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/emailIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_email"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/contactText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_contact_us"
+                        android:layout_below="@id/emailIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/contactDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_contact_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/contactText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyt2"
+                android:layout_below="@+id/lyt1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:layout_marginTop="5dp">
+
+                <RelativeLayout
+                    android:id="@+id/privacyPolicy"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/privacyIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_privacy_policy"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/privacyText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_privacy_policy"
+                        android:layout_below="@id/privacyIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/privacyDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_privacy_policy_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/privacyText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/termsConditions"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/termsIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_terms"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/termsText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_terms_condition"
+                        android:layout_below="@id/termsIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/termsDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_terms_condition_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/termsText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/lyt3"
+                android:layout_below="@+id/lyt2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginHorizontal="@dimen/_10sdp"
+                android:layout_marginTop="5dp">
+
+
+
+                <RelativeLayout
+                    android:id="@+id/logOut"
+                    android:layout_width="0dp"
+                    android:layout_height="130dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_redeem_item">
+
+                    <ImageView
+                        android:id="@+id/logoutIcon"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:src="@drawable/ic_logout"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:layout_marginLeft="@dimen/_20sdp"
+                        android:layout_marginRight="@dimen/_20sdp"
+                        android:adjustViewBounds="true"
+                        app:tint="@color/white"/>
+
+
+                    <TextView
+                        android:id="@+id/logoutText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_logout"
+                        android:layout_below="@id/logoutIcon"
+                        android:textStyle="bold"
+                        android:textAlignment="center"
+                        android:textColor="@color/white"
+                        android:textSize="@dimen/_14sdp"/>
+
+
+                    <TextView
+                        android:id="@+id/logoutDesc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_logout_desc"
+                        android:textAlignment="center"
+                        android:textStyle="normal"
+                        android:layout_below="@id/logoutText"
+                        android:textColor="@color/desc_color"
+                        android:textSize="@dimen/_10sdp"/>
+
+
+                </RelativeLayout>
+
+
+            </LinearLayout>
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+</RelativeLayout>
