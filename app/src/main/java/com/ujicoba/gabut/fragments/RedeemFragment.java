@@ -76,7 +76,6 @@ public class RedeemFragment extends Fragment {
         Methods.initUserProfile(requireActivity(), profileBinding, "Riwayat Kirim Berlian");
         profileBinding.profileButton.setOnClickListener(v -> {
             Methods.gotoNextActivity(requireActivity(), RedeemHistoryActivity.class);
-            requireActivity().finish();
         });
     }
 

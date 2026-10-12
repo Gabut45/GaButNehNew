@@ -1,0 +1,23 @@
+pluginManagement {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        // Tambahan ini untuk Mintegral
+        //maven { url "https://dl-maven.mintegral.com/repository/mbridge_android_sdk_oversea" }
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+        // Tambahan ini untuk Mintegral
+        //maven { url "https://dl-maven.mintegral.com/repository/mbridge_android_sdk_oversea" }
+    }
+}
+rootProject.name = "GaBut"
+include ':app'
+include ':library'

@@ -53,10 +53,16 @@ public class RedeemHistoryActivity extends AppCompatActivity {
     private void initProfile() {
         LayoutProfileBinding profileBinding = LayoutProfileBinding.bind(binding.layoutProfile.getRoot());
         Methods.initUserProfile(this, profileBinding, "Kembali");
-        profileBinding.profileButton.setOnClickListener(v -> {
-            Methods.gotoNextActivity(this, MainActivity.class);
-            finish();
+        profileBinding.profileButton.setOnClickListener(view -> {
+            Methods.gotoNextActivity(RedeemHistoryActivity.this, MainActivity.class);
         });
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 
     private void loadRedeemHistoryItems() {

@@ -4,9 +4,11 @@ import android.app.AlertDialog;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
 
@@ -43,47 +45,69 @@ import java.util.function.Consumer;
 import me.ibrahimsn.lib.OnItemSelectedListener;
 
 public class MainActivity extends AppCompatActivity {
+
     ActivityMainBinding binding;
+
     private static final String PREFS_NAME = "PromoPrefs";
     private static final String PREF_HIDE_UNTIL = "HideUntil";
+
+    private static final String SHOWCASE_PREF = "ShowcasePrefs";
+    private static final String KEY_FIRST_SHOWCASE = "first_showcase";
+
     private AlertDialog promoDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
         Methods.setFullScreen(this);
+
         setUpBottomNavigation();
         openFragmentOnNotification();
+
+        // Showcase onboarding pertama kali
+        checkFirstTimeShowcase();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
         checkAndShowPromoDialog();
 
-        // ✅ Tambahan: Cek blokir user setiap kali user kembali ke MainActivity
+        // Cek blokir user setiap kembali ke MainActivity
         Methods.checkUserBlockNow(this);
     }
 
-
     private void setUpBottomNavigation() {
         loadFragment(new HomeFragment(), false);
+
         binding.bottomBar.setOnItemSelectedListener(new OnItemSelectedListener() {
             @Override
             public boolean onItemSelect(int i) {
                 switch (i) {
                     case 0:
-                        loadFragment(new HomeFragment(), true); break;
+                        loadFragment(new HomeFragment(), true);
+                        break;
+
                     case 1:
-                        loadFragment(new LeaderboardFragment(), true); break;
+                        loadFragment(new LeaderboardFragment(), true);
+                        break;
+
                     case 2:
-                        loadFragment(new ReferFragment(), true); break;
+                        loadFragment(new ReferFragment(), true);
+                        break;
+
                     case 3:
-                        checkRedeemAccess(); break;
+                        checkRedeemAccess();
+                        break;
+
                     case 4:
-                        loadFragment(new ProfileFragment(), true); break;
+                        loadFragment(new ProfileFragment(), true);
+                        break;
                 }
                 return true;
             }
@@ -92,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkRedeemAccess() {
         int userCoins = 0;
+
         try {
             userCoins = Integer.parseInt(Methods.getData(this, Data.USER_COINS));
         } catch (NumberFormatException e) {
@@ -107,8 +132,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void showLockedRedeemDialog() {
         View dialogView = LayoutInflater.from(this).inflate(R.layout.redeem_locked_dialog, null);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
+
         AlertDialog dialog = builder.create();
 
         if (dialog.getWindow() != null) {
@@ -125,32 +152,39 @@ public class MainActivity extends AppCompatActivity {
     public void loadFragment(Fragment fragment, boolean isReplace) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
+
         if (isReplace) {
             ft.replace(R.id.container, fragment);
         } else {
             ft.add(R.id.container, fragment);
         }
+
         ft.addToBackStack(null);
         ft.commit();
     }
 
     private void openFragmentOnNotification() {
         String fragmentName = getIntent().getStringExtra("fragmentName");
+
         if (fragmentName != null) {
             String fragName = Methods.getData(this, "fragName");
+
             switch (fragName) {
                 case "LeaderboardFragment":
                     loadFragment(new LeaderboardFragment(), true);
                     Log.e("fragName", fragmentName);
                     break;
+
                 case "ReferFragment":
                     loadFragment(new ReferFragment(), true);
                     Log.e("fragName", fragmentName);
                     break;
+
                 case "RedeemFragment":
                     checkRedeemAccess();
                     Log.e("fragName", fragmentName);
                     break;
+
                 case "ProfileFragment":
                     loadFragment(new ProfileFragment(), true);
                     Log.e("fragName", fragmentName);
@@ -159,9 +193,130 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // ===============================
+    // SHOWCASE FIRST LOGIN
+    // ===============================
+    private void checkFirstTimeShowcase() {
+        SharedPreferences prefs = getSharedPreferences(SHOWCASE_PREF, MODE_PRIVATE);
+        boolean isFirstTime = prefs.getBoolean(KEY_FIRST_SHOWCASE, true);
+
+        if (isFirstTime) {
+            new Handler().postDelayed(() -> {
+                showAppTour();
+                prefs.edit().putBoolean(KEY_FIRST_SHOWCASE, false).apply();
+            }, 1500);
+        }
+    }
+    private void showAppTour() {
+
+        List<ShowcaseItem> items = new ArrayList<>();
+
+        // Ambil root fragment home
+        View homeRoot = findViewById(R.id.container);
+
+        // Tunggu fragment selesai render
+        homeRoot.post(() -> {
+
+            View profileView = findViewById(R.id.layoutProfile);
+            View promoView = findViewById(R.id.viewPager2);
+            View checkInView = findViewById(R.id.checkInBtn);
+            View spinView = findViewById(R.id.spinBtn);
+            View gameView = findViewById(R.id.gameBtn);
+            View taskView = findViewById(R.id.taskBtn);
+            View navView = binding.bottomBar;
+
+            if (profileView != null) {
+                items.add(new ShowcaseItem(
+                        profileView,
+                        "🪙 Your Coin Balance",
+                        "This section shows your profile, coin balance, and account progress.",
+                        1,
+                        7
+                ));
+            }
+
+            if (promoView != null) {
+                items.add(new ShowcaseItem(
+                        promoView,
+                        "✨ Promotions & News",
+                        "Swipe to see the latest promotions, rewards, and special events.",
+                        2,
+                        7
+                ));
+            }
+
+            if (checkInView != null) {
+                items.add(new ShowcaseItem(
+                        checkInView,
+                        "📅 Daily Check-In",
+                        "Check in every day to claim free bonus rewards.",
+                        3,
+                        7
+                ));
+            }
+
+            if (spinView != null) {
+                items.add(new ShowcaseItem(
+                        spinView,
+                        "🎰 Lucky Spin",
+                        "Spin daily for bonus coins and exciting prizes.",
+                        4,
+                        7
+                ));
+            }
+
+            if (gameView != null) {
+                items.add(new ShowcaseItem(
+                        gameView,
+                        "🎮 Play Games",
+                        "Play games to earn more rewards and extra income.",
+                        5,
+                        7
+                ));
+            }
+
+            if (taskView != null) {
+                items.add(new ShowcaseItem(
+                        taskView,
+                        "✅ Complete Tasks",
+                        "Complete tasks, watch videos, and offers for maximum rewards.",
+                        6,
+                        7
+                ));
+            }
+
+            if (navView != null) {
+                items.add(new ShowcaseItem(
+                        navView,
+                        "📱 Navigation Menu",
+                        "Use this menu to navigate between Home, Leaderboard, Refer, Redeem, and Profile.",
+                        7,
+                        7
+                ));
+            }
+
+            if (!items.isEmpty()) {
+                CustomShowcaseView showcaseView = new CustomShowcaseView(this, items);
+
+                addContentView(
+                        showcaseView,
+                        new ViewGroup.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
+                        )
+                );
+            }
+        });
+    }
+
+
+    // ===============================
+    // PROMO DIALOG
+    // ===============================
     private void checkAndShowPromoDialog() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         long hideUntil = prefs.getLong(PREF_HIDE_UNTIL, 0);
+
         if (System.currentTimeMillis() >= hideUntil) {
             showPromoDialog();
         }
@@ -171,8 +326,10 @@ public class MainActivity extends AppCompatActivity {
         if (isFinishing() || isDestroyed()) return;
 
         View dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_promo, null);
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(dialogView);
+
         promoDialog = builder.create();
 
         if (promoDialog.getWindow() != null) {
@@ -195,21 +352,30 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onPageSelected(int position) {
                     int total = adapter.getItemCount();
+
                     btnPrev.setVisibility(position == 0 ? View.GONE : View.VISIBLE);
                     btnNext.setVisibility(position == total - 1 ? View.GONE : View.VISIBLE);
                     btnClose.setVisibility(position == total - 1 ? View.VISIBLE : View.GONE);
                 }
             });
 
-            btnPrev.setOnClickListener(v -> viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true));
-            btnNext.setOnClickListener(v -> viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true));
+            btnPrev.setOnClickListener(v ->
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() - 1, true));
+
+            btnNext.setOnClickListener(v ->
+                    viewPager.setCurrentItem(viewPager.getCurrentItem() + 1, true));
+
             btnClose.setOnClickListener(v -> {
                 if (checkBox.isChecked()) {
                     long tomorrow = System.currentTimeMillis() + 24 * 60 * 60 * 1000;
-                    SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+
+                    SharedPreferences.Editor editor =
+                            getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
+
                     editor.putLong(PREF_HIDE_UNTIL, tomorrow);
                     editor.apply();
                 }
+
                 if (promoDialog != null && promoDialog.isShowing()) {
                     promoDialog.dismiss();
                 }
@@ -227,31 +393,42 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadPromosFromApi(Consumer<List<PromoItem>> callback) {
         String url = "https://work.gabutgame.my.id/aapi_files/api_get_promos.php";
+
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        JsonArrayRequest request = new JsonArrayRequest(Request.Method.GET, url, null,
+        JsonArrayRequest request = new JsonArrayRequest(
+                Request.Method.GET,
+                url,
+                null,
                 response -> {
                     List<PromoItem> promos = new ArrayList<>();
+
                     for (int i = 0; i < response.length(); i++) {
                         try {
                             JSONObject obj = response.getJSONObject(i);
+
                             String image = obj.getString("image_url");
                             String link = obj.getString("link");
+
                             promos.add(new PromoItem(image, link));
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                     }
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         callback.accept(promos);
                     }
                 },
                 error -> {
                     error.printStackTrace();
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                         callback.accept(Collections.emptyList());
                     }
-                });
+                }
+        );
 
         queue.add(request);
     }
@@ -271,16 +448,19 @@ public class MainActivity extends AppCompatActivity {
         if (promoDialog != null && promoDialog.isShowing()) {
             promoDialog.dismiss();
         }
+
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
         if (getSupportFragmentManager().getBackStackEntryCount() == 1) {
+
             SantaCustomDialog exitDialog = new SantaCustomDialog(
                     this,
                     "normal",
-                    1200, R.drawable.ic_exit,
+                    1200,
+                    R.drawable.ic_exit,
                     "Meninggalkan Aplikasi GaBut?",
                     "Yakin, Ingin menutup aplikasi GaBut ?",
                     "null",
@@ -289,8 +469,10 @@ public class MainActivity extends AppCompatActivity {
                     "null",
                     "null"
             );
+
             exitDialog.show();
             exitDialog.setOnDialogButtonClickListener(this::finishAffinity);
+
         } else {
             super.onBackPressed();
         }
