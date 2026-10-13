@@ -1,18 +1,19 @@
 package com.ujicoba.gabut.activities;
 
+import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.ujicoba.gabut.BuildConfig;
 import com.ujicoba.gabut.R;
 import com.ujicoba.gabut.api.Data;
@@ -34,9 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import android.os.CountDownTimer;
-
-import santacoder.luckywheel.LuckyWheelView;
 import santacoder.luckywheel.model.LuckyItem;
 
 public class SpinActivity extends AppCompatActivity implements AdsManager.AdsManagerCallback, ApplovinManager.ApplovinManagerCallback {
@@ -44,19 +42,19 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
     private final String TAG = SpinActivity.class.getSimpleName();
     private MediaPlayer wheelSound;
     private MediaPlayer dialogSound;
-    private static final int SPIN_DURATION = 5000;
-    private static final long SPIN_DELAY_MS = 10 * 60 * 1000;
+    private static final long SPIN_DELAY_MS = 10 * 60 * 1000; // 10 menit
     private SharedPreferences sharedPreferences;
     private static final String PREF_NAME = "spin_prefs";
     private static final String KEY_LAST_SPIN_TIME = "last_spin_time";
 
-    List<LuckyItem> luckyItems = new ArrayList<>();
+    private final List<LuckyItem> luckyItems = new ArrayList<>();
     private SantaCustomDialog coinDialog;
     private LayoutProfileBinding profileBinding;
     private String adType;
     private int spinId;
 
     private CountDownTimer countDownTimer;
+    private ProgressDialog adLoadingDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +65,11 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
 
         sharedPreferences = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
 
+        // Inisialisasi dialog loading jika koneksi lambat
+        adLoadingDialog = new ProgressDialog(this);
+        adLoadingDialog.setMessage("Menyiapkan iklan hadiah...");
+        adLoadingDialog.setCancelable(false);
+
         if (Methods.isNetworkConnected(this)) {
             binding.availableSpins.setText(String.format("%s %s",
                     Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN),
@@ -74,10 +77,18 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
 
             adType = Methods.getData(SpinActivity.this, Data.ADS_NETWORK_NAME);
             loadAds(adType);
+
+            // Preload iklan sejak awal
+            preloadRewardedAd();
+            preloadInterstitialAd();
+
             initProfile();
             loadWheelItems();
 
-            int availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
+            int availableSpin = 0;
+            try {
+                availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
+            } catch (NumberFormatException ignored) {}
             updatePlayButtonState(availableSpin);
 
         } else {
@@ -123,10 +134,19 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
                     return;
                 }
 
-                int availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
+                int availableSpin = 0;
+                try {
+                    availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
+                } catch (NumberFormatException ignored) {}
+
                 if (availableSpin <= 0) {
                     Methods.showToast(this, getString(R.string.msg_no_spin_available));
                     updatePlayButtonState(availableSpin);
+                    return;
+                }
+
+                if (luckyItems.isEmpty()) {
+                    Methods.showToast(this, "Memuat roda hadiah...");
                     return;
                 }
 
@@ -151,51 +171,50 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
                     dialogSound.start();
                 }
 
-                spinId = luckyItems.get(index).id;
+                if (index >= 0 && index < luckyItems.size()) {
+                    spinId = luckyItems.get(index).id;
 
-                Methods.sendRequestToServer(TAG, SpinActivity.this, spinId,
-                        getString(R.string.spin_text),
-                        profileBinding.userCoins, binding.availableSpins, null);
+                    Methods.sendRequestToServer(TAG, SpinActivity.this, spinId,
+                            getString(R.string.spin_text),
+                            profileBinding.userCoins, binding.availableSpins, null);
 
-                int availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
-                availableSpin--;
-                Methods.setData(SpinActivity.this, Data.AVAILABLE_SPIN, String.valueOf(availableSpin));
+                    int availableSpin = 0;
+                    try {
+                        availableSpin = Integer.parseInt(Methods.getData(SpinActivity.this, Data.AVAILABLE_SPIN));
+                    } catch (NumberFormatException ignored) {}
+                    availableSpin = Math.max(0, availableSpin - 1);
+                    Methods.setData(SpinActivity.this, Data.AVAILABLE_SPIN, String.valueOf(availableSpin));
 
-                binding.availableSpins.setText(String.format("%s %s", availableSpin, getString(R.string.text_spin_available)));
-                updatePlayButtonState(availableSpin);
+                    binding.availableSpins.setText(String.format("%s %s", availableSpin, getString(R.string.text_spin_available)));
+                    updatePlayButtonState(availableSpin);
 
-                coinDialog = new SantaCustomDialog(
-                        SpinActivity.this,
-                        "coin",
-                        1200,
-                        R.drawable.ic_no_internet,
-                        getString(R.string.msg_congratulations),
-                        getString(R.string.msg_you_got) + " " + Methods.getNumberFromText(luckyItems.get(index).text) + " " + getString(R.string.text_coins) + " " + getString(R.string.spiniklan),
-                        Methods.getNumberFromText(luckyItems.get(index).text),
-                        getString(R.string.btn_ok_thanks),
-                        getString(R.string.btn_ok_thanks),
-                        "Enter Referral Code",
-                        "null"
-                );
+                    String coinsWon = Methods.getNumberFromText(luckyItems.get(index).text);
 
-                coinDialog.setOnDialogButtonClickListener(() -> {
-                    if (adType.equalsIgnoreCase("google_ads_manager")) {
-                        AdsManager.loadInterstitialAds(this); // Load iklan gam inter dulu
-                        AdsManager.showInterstitialAds(SpinActivity.this);
-                    } else if (adType.equalsIgnoreCase("admob")) {
-                        AdmobManager.loadInterstitialAd(this); // Load iklan admob inter dulu
-                        AdmobManager.showInterstitialAd(SpinActivity.this);
-                    } else if (adType.equalsIgnoreCase("applovin")) {
-                        ApplovinManager.showApplovinInterstitial(SpinActivity.this);
-                    }
-                    coinDialog.dismiss();
-                });
+                    coinDialog = new SantaCustomDialog(
+                            SpinActivity.this,
+                            "coin",
+                            1200,
+                            R.drawable.ic_no_internet,
+                            getString(R.string.msg_congratulations),
+                            getString(R.string.msg_you_got) + " " + coinsWon + " " + getString(R.string.text_coins) + " " + getString(R.string.spiniklan),
+                            coinsWon,
+                            getString(R.string.btn_ok_thanks),
+                            getString(R.string.btn_ok_thanks),
+                            "Enter Referral Code",
+                            "null"
+                    );
 
+                    // Saat tombol OKE ditekan (tampilkan Interstitial jika sudah ready)
+                    coinDialog.setOnDialogButtonClickListener(() -> {
+                        showInterstitialSafe();
+                        coinDialog.dismiss();
+                    });
 
+                    // Saat tombol "TONTON IKLAN (+500)" ditekan
+                    coinDialog.setOnRewardedButtonClickListener(this::showRewardedAdForBonus);
 
-                coinDialog.setOnRewardedButtonClickListener(this::showRewardedAdForBonus);
-
-                coinDialog.show();
+                    coinDialog.show();
+                }
             });
 
         } else {
@@ -221,8 +240,8 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
                 binding.cooldownTimerText.setVisibility(View.GONE);
             }
         }.start();
-        // ✅ Cek apakah user harus diblokir
-        Methods.checkUserBlockNow(this); // untuk pengecekan pemblokiran
+
+        Methods.checkUserBlockNow(this);
     }
 
     private void getWheelItems() {
@@ -230,13 +249,14 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
             try {
                 if (response.getString("status").equalsIgnoreCase("1")) {
                     JSONArray wheelArray = response.getJSONArray("spins_data");
+                    luckyItems.clear();
                     for (int i = 0; i < wheelArray.length(); i++) {
                         JSONObject wheelObj = wheelArray.getJSONObject(i);
-                        int spinId = wheelObj.getInt("id");
+                        int id = wheelObj.getInt("id");
                         String spinCoins = wheelObj.getString("spin_coins");
                         String spinColor = wheelObj.getString("spin_color");
                         LuckyItem luckyItem = new LuckyItem(
-                                spinId,
+                                id,
                                 spinCoins + " " + getString(R.string.text_coins),
                                 R.drawable.coin,
                                 Color.parseColor(spinColor));
@@ -254,68 +274,142 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
     }
 
     private void loadAds(String type) {
+        if (type == null) return;
         if (type.equalsIgnoreCase("google_ads_manager")) {
             AdsManager.setAdsManagerCallback(this);
             AdsManager.initAds(this);
-        } else if (type.equalsIgnoreCase("admob")) {
-            // AdmobManager.initAdmob(this, binding.bannerLayout.bannerLayout);
-            // Interstitial juga hanya load saat tombol OK, jangan load di sini
         } else if (type.equalsIgnoreCase("applovin")) {
             ApplovinManager.setApplovinManagerCallback(this);
             ApplovinManager.initApplovin(this, binding.bannerLayout.bannerLayout);
         }
     }
 
-    private void showRewardedAdForBonus() {
+    // Preload iklan rewarded di latar belakang
+    private void preloadRewardedAd() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.loadRewardedAd(this);
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.loadRewardedAd(this);
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            ApplovinManager.loadApplovinRewarded(this);
+        }
+    }
 
+    // Preload iklan interstitial di latar belakang
+    private void preloadInterstitialAd() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.loadInterstitialAds(this);
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.loadInterstitialAd(this);
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            // AppLovin interstitial biasanya di-handle oleh manager
+        }
+    }
+
+    // Tampilkan interstitial yang sudah siap (tanpa load berbarengan)
+    private void showInterstitialSafe() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.showInterstitialAds(this);
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.showInterstitialAd(this);
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            ApplovinManager.showApplovinInterstitial(this);
+        }
+        // Preload untuk putaran berikutnya
+        preloadInterstitialAd();
+    }
+
+    // Menampilkan iklan hadiah (+500 berlian) dengan mulus
+    private void showRewardedAdForBonus() {
         Runnable rewardAction = () -> {
             Methods.sendRequestToServer(
                     TAG,
                     SpinActivity.this,
-                    0, // pakai 0 karena ini bukan dari id spin
-                    getString(R.string.iklan_text), // pakai iklan_text
+                    0,
+                    getString(R.string.iklan_text),
                     profileBinding.userCoins,
-                    null, // biar tidak mengurangi jumlah spin setelah lihat iklan
-                    null // jangan pakai "rewarded_bonus"
+                    null,
+                    null
             );
-            Methods.showToast(this, "Berlian dari Tonton Iklan!");
+            Methods.showToast(this, "Berlian dari Tonton Iklan berhasil ditambahkan!");
 
-
-            // Langsung kembali ke tampilan spin, tutup dialog
             if (coinDialog != null && coinDialog.isShowing()) {
                 coinDialog.dismiss();
             }
+
+            // Langsung siapkan iklan berikutnya untuk putaran selanjutnya
+            preloadRewardedAd();
         };
 
+        boolean isReady = false;
+        if (adType != null) {
+            if (adType.equalsIgnoreCase("google_ads_manager")) {
+                isReady = AdsManager.isRewardedAdReady();
+            } else if (adType.equalsIgnoreCase("admob")) {
+                isReady = AdmobManager.isRewardedAdReady();
+            } else if (adType.equalsIgnoreCase("applovin")) {
+                isReady = ApplovinManager.isRewardedAdReady();
+            }
+        }
+
+        if (isReady) {
+            // Jika sudah siap: langsung putar seketika!
+            playRewardedAd(rewardAction);
+        } else {
+            // Jika belum selesai download (misal koneksi lambat):
+            // Tampilkan loading sebentar lalu otomatis putar, tanpa paksa klik 2 kali
+            if (!isFinishing() && !isDestroyed()) {
+                adLoadingDialog.show();
+            }
+            preloadRewardedAd();
+
+            // Beri toleransi waktu 2.5 detik untuk menyelesaikan download
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (adLoadingDialog != null && adLoadingDialog.isShowing()) {
+                    adLoadingDialog.dismiss();
+                }
+                playRewardedAd(rewardAction);
+            }, 2500);
+        }
+    }
+
+    private void playRewardedAd(Runnable onReward) {
+        if (adType == null) return;
         if (adType.equalsIgnoreCase("google_ads_manager")) {
             if (AdsManager.isRewardedAdReady()) {
-                AdsManager.showRewardedAd(this, rewardItem -> rewardAction.run());
+                AdsManager.showRewardedAd(this, rewardItem -> onReward.run());
             } else {
-                Methods.showToast(this, "Iklan belum siap. Coba lagi setelah beberapa saat.");
-                AdsManager.loadRewardedAd(this); // // Baru di-load kalau user klik
+                Methods.showToast(this, "Iklan sedang dimuat, silakan coba beberapa detik lagi.");
             }
         } else if (adType.equalsIgnoreCase("admob")) {
             if (AdmobManager.isRewardedAdReady()) {
-                AdmobManager.showRewardedAd(this, rewardItem -> rewardAction.run());
+                AdmobManager.showRewardedAd(this, rewardItem -> onReward.run());
             } else {
-                Methods.showToast(this, "Iklan belum siap. Coba lagi setelah beberapa saat.");
-                AdmobManager.loadRewardedAd(this); // Baru di-load kalau user klik
+                Methods.showToast(this, "Iklan sedang dimuat, silakan coba beberapa detik lagi.");
             }
         } else if (adType.equalsIgnoreCase("applovin")) {
             if (ApplovinManager.isRewardedAdReady()) {
-                ApplovinManager.showRewardedAd(this, rewardAction);
+                ApplovinManager.showRewardedAd(this, onReward);
             } else {
-                Methods.showToast(this, "Iklan belum siap. Coba lagi setelah beberapa saat.");
-                ApplovinManager.loadApplovinRewarded(this); // Baru di-load kalau user klik
+                Methods.showToast(this, "Iklan sedang dimuat, silakan coba beberapa detik lagi.");
             }
         }
     }
 
+    @Override
+    public void onAdDismissed() {
+        preloadRewardedAd();
+        preloadInterstitialAd();
+    }
 
     @Override
-    public void onAdDismissed() {}
-    @Override
-    public void onAdHidden() {}
+    public void onAdHidden() {
+        preloadRewardedAd();
+        preloadInterstitialAd();
+    }
 
     @Override
     public void onBackPressed() {
@@ -323,14 +417,12 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
         finish();
     }
 
-    @Override protected void onStart() { super.onStart(); }
-    @Override protected void onRestart() { super.onRestart(); }
-    @Override protected void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
         wheelSound = MediaPlayer.create(this, R.raw.wheelsound);
         dialogSound = MediaPlayer.create(this, R.raw.popup);
-        // ✅ Cek apakah user harus diblokir
-        Methods.checkUserBlockNow(this); // untuk pengecekan pemblokiran
+        Methods.checkUserBlockNow(this);
     }
 
     @Override
@@ -353,6 +445,9 @@ public class SpinActivity extends AppCompatActivity implements AdsManager.AdsMan
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (adLoadingDialog != null && adLoadingDialog.isShowing()) {
+            adLoadingDialog.dismiss();
+        }
         if (wheelSound != null) { wheelSound.release(); wheelSound = null; }
         if (dialogSound != null) { dialogSound.release(); dialogSound = null; }
         if (countDownTimer != null) { countDownTimer.cancel(); countDownTimer = null; }

@@ -3,11 +3,13 @@ package com.ujicoba.gabut.activities;
 import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.android.volley.Request;
 import com.ujicoba.gabut.BottomMarginDecoration;
 import com.ujicoba.gabut.BuildConfig;
@@ -25,9 +27,11 @@ import com.ujicoba.gabut.utils.AppClass;
 import com.ujicoba.gabut.utils.ApplovinManager;
 import com.ujicoba.gabut.utils.Methods;
 import com.ujicoba.gabut.utils.SantaCustomDialog;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,6 +62,7 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
         if (Methods.isNetworkConnected(this)) {
             adType = Methods.getData(this, Data.ADS_NETWORK_NAME);
             loadAds(adType);
+            preloadInterstitial(); // Preload iklan di awal agar tidak delay
             initProfile();
             loadGames();
         } else {
@@ -72,6 +77,31 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
             Methods.gotoNextActivity(this, MainActivity.class);
             finish();
         });
+    }
+
+    private void preloadInterstitial() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.loadInterstitialAds(this);
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.loadInterstitialAd(this);
+        }
+    }
+
+    private void showInterstitialSafe() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.showInterstitialAds(GameActivity.this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.showInterstitialAd(GameActivity.this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            ApplovinManager.showApplovinInterstitial(GameActivity.this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        }
+        // Siapkan iklan berikutnya
+        preloadInterstitial();
     }
 
     private void loadGames() {
@@ -148,20 +178,20 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
         AppClass.getInstance(this).addToRequestQueue(gamesRequest, TAG);
     }
 
-    // ✅ Pop-up konfirmasi biaya main
+    // Pop-up konfirmasi aktivasi misi game (diksi aman dan ramah Google Play)
     private void showPlayConfirmationDialog(GamesModel game) {
-        String message = "Untuk memainkan <b>\"" + game.getGameName() + "\"</b><br><br>" +
-                "💎 Biaya bermain: <b>" + game.getGameCost() + " berlian</b><br>" +
-                "⏱️ Durasi minimal: <b>" + game.getGamePlayTime() + " menit</b><br>" +
-                "🎁 Hadiah jika berhasil: <b>+" + game.getGameCoin() + " berlian</b><br><br>" +
-                "⛔ <b>PENTING: Biaya <b>" + game.getGameCost() + " berlian akan hangus jika Anda keluar atau durasi bermain kurang dari " + game.getGamePlayTime() + " menit</b><br><br>" +
-                "Apakah kamu ingin melanjutkan bermain?";
+        String message = "Untuk membuka tantangan <b>\"" + game.getGameName() + "\"</b><br><br>" +
+                "💎 Tiket tantangan: <b>" + game.getGameCost() + " berlian</b><br>" +
+                "⏱️ Durasi misi: <b>" + game.getGamePlayTime() + " menit</b><br>" +
+                "🎁 Hadiah penyelesaian: <b>+" + game.getGameCoin() + " berlian</b><br><br>" +
+                "⚠️ <b>Catatan: Selesaikan durasi bermain hingga selesai untuk mendapatkan reward diamond game.</b><br><br>" +
+                "Apakah kamu ingin memulai tantangan ini?";
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Konfirmasi Bermain Game")
+        new AlertDialog.Builder(this)
+                .setTitle("Konfirmasi Tantangan Game")
                 .setMessage(android.text.Html.fromHtml(message, android.text.Html.FROM_HTML_MODE_LEGACY))
                 .setCancelable(false)
-                .setPositiveButton("OK", (dialog, which) -> {
+                .setPositiveButton("MULAI", (dialog, which) -> {
                     dialog.dismiss();
                     startGameWithCost(game);
                 })
@@ -169,13 +199,13 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
                 .show();
     }
 
-    // ✅ Proses potong koin di server
+    // Proses aktivasi misi game di server
     private void startGameWithCost(GamesModel game) {
         String userId = Methods.getData(this, Data.USER_ID);
         String url = BuildConfig.MAIN_URL + "/aapi_files/api_start_game.php?user_id=" + userId + "&game_id=" + game.getId();
 
         ProgressDialog progress = new ProgressDialog(this);
-        progress.setMessage("Memproses biaya bermain...");
+        progress.setMessage("Membuka tantangan game...");
         progress.setCancelable(false);
         progress.show();
 
@@ -246,6 +276,8 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
     }
 
     private void showCoinDialog() {
+        if (isFinishing() || isDestroyed()) return;
+
         coinDialog = new SantaCustomDialog(
                 this,
                 "cointanpaiklan",
@@ -264,20 +296,7 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
 
         coinDialog.setOnDialogButtonClickListener(() -> {
             coinDialog.dismiss();
-
-            if (adType.equalsIgnoreCase("google_ads_manager")) {
-                AdsManager.loadInterstitialAds(this);
-                AdsManager.showInterstitialAds(GameActivity.this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("admob")) {
-                AdmobManager.loadInterstitialAd(this);
-                AdmobManager.showInterstitialAd(GameActivity.this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("applovin")) {
-                ApplovinManager.showApplovinInterstitial(GameActivity.this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            }
-
+            showInterstitialSafe(); // Iklan interstitial tayang secara aman
             loadGames();
         });
 
@@ -285,6 +304,8 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
     }
 
     private void showInsufficientDialog(int remainingSeconds) {
+        if (isFinishing() || isDestroyed()) return;
+
         insufficentDialog = new SantaCustomDialog(
                 this,
                 "insufficient",
@@ -310,19 +331,23 @@ public class GameActivity extends AppCompatActivity implements AdsManager.AdsMan
     }
 
     private void loadAds(String type) {
+        if (type == null) return;
         if (type.equalsIgnoreCase("google_ads_manager")) {
             AdsManager.setAdsManagerCallback(this);
             AdsManager.initAds(this);
-        } else if (type.equalsIgnoreCase("admob")) {
-            // Tidak load interstitial di awal
         } else if (type.equalsIgnoreCase("applovin")) {
             ApplovinManager.setApplovinManagerCallback(this);
             ApplovinManager.initApplovin(this, binding.bannerLayout.bannerLayout);
         }
     }
 
-    @Override public void onAdDismissed() {}
-    @Override public void onAdHidden() {}
+    @Override public void onAdDismissed() {
+        preloadInterstitial();
+    }
+
+    @Override public void onAdHidden() {
+        preloadInterstitial();
+    }
 
     @Override
     public void onBackPressed() {

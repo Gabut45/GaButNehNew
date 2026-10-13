@@ -5,15 +5,21 @@ import android.app.Application;
 import android.content.Context;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.ujicoba.gabut.api.Data;
 
+import java.lang.ref.WeakReference;
+
 public class AppClass extends Application {
+
     private static AppClass instance;
     private RequestQueue requestQueue;
-    private Activity currentActivity;
+    private WeakReference<Activity> currentActivityRef; // ✅ Aman dari Memory Leak
     private AppOpenObserver appOpenObserver;
 
     @Override
@@ -21,23 +27,54 @@ public class AppClass extends Application {
         super.onCreate();
         instance = this;
 
-        // ✅ Update metadata ID iklan dari server
-        Methods.updateMetaData(getApplicationContext(),
-                "com.google.android.gms.ads.APPLICATION_ID",
-                Methods.getData(getApplicationContext(), Data.GAM_APP_ID));
-        Methods.updateMetaData(getApplicationContext(),
-                "applovin.sdk.key",
-                Methods.getData(getApplicationContext(), Data.AL_SDK_KEY));
+        // ✅ Cegah crash: Hanya update metadata jika datanya memang valid/ada dari server
+        String gamAppId = Methods.getData(this, Data.GAM_APP_ID);
+        if (gamAppId != null && !gamAppId.trim().isEmpty()) {
+            Methods.updateMetaData(this, "com.google.android.gms.ads.APPLICATION_ID", gamAppId);
+        }
 
-        // ✅ Preload Open Ads
-        AdmobOpenManager.getInstance(this);
-        AppLovinOpenManager.getInstance(this);
+        String alKey = Methods.getData(this, Data.AL_SDK_KEY);
+        if (alKey != null && !alKey.trim().isEmpty()) {
+            Methods.updateMetaData(this, "applovin.sdk.key", alKey);
+        }
 
-        // ✅ Init AppOpenObserver
+        // ✅ Otomatis pantau Activity aktif secara aman tanpa memory leak
+        registerActivityLifecycleCallbacks(new ActivityLifecycleCallbacks() {
+            @Override
+            public void onActivityResumed(@NonNull Activity activity) {
+                currentActivityRef = new WeakReference<>(activity);
+            }
+
+            @Override
+            public void onActivityPaused(@NonNull Activity activity) {
+                if (currentActivityRef != null && currentActivityRef.get() == activity) {
+                    currentActivityRef.clear();
+                }
+            }
+
+            @Override public void onActivityCreated(@NonNull Activity activity, @Nullable Bundle savedInstanceState) {}
+            @Override public void onActivityStarted(@NonNull Activity activity) {}
+            @Override public void onActivityStopped(@NonNull Activity activity) {}
+            @Override public void onActivitySaveInstanceState(@NonNull Activity activity, @NonNull Bundle outState) {}
+            @Override public void onActivityDestroyed(@NonNull Activity activity) {
+                if (currentActivityRef != null && currentActivityRef.get() == activity) {
+                    currentActivityRef.clear();
+                }
+            }
+        });
+
+        // ✅ Inisialisasi AppOpenObserver
         appOpenObserver = new AppOpenObserver(this);
     }
 
-    public static synchronized AppClass getInstance(Context context) {
+    /**
+     * Singleton instance tanpa butuh parameter Context
+     */
+    public static synchronized AppClass getInstance() {
+        return instance;
+    }
+
+    public static AppClass getInstance(Context context) {
         return (AppClass) context.getApplicationContext();
     }
 
@@ -59,16 +96,22 @@ public class AppClass extends Application {
         }
     }
 
+    /**
+     * Dapatkan activity yang sedang aktif di layar (bisa null jika app di background)
+     */
     public Activity getCurrentActivity() {
-        return currentActivity;
+        return currentActivityRef != null ? currentActivityRef.get() : null;
     }
 
     public AppOpenObserver getAppOpenObserver() {
         return appOpenObserver;
     }
-
-    // ✅ Update currentActivity secara global
+    // ✅ Tambahkan method ini agar kompatibel dengan GameListActivity dan activity lainnya
     public void setCurrentActivity(Activity activity) {
-        this.currentActivity = activity;
+        if (activity != null) {
+            this.currentActivityRef = new java.lang.ref.WeakReference<>(activity);
+        } else if (this.currentActivityRef != null) {
+            this.currentActivityRef.clear();
+        }
     }
 }

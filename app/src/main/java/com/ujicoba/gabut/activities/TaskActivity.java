@@ -76,6 +76,7 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void preloadInterstitial(String type) {
+        if (type == null) return;
         if (type.equalsIgnoreCase("google_ads_manager")) {
             AdsManager.loadInterstitialAds(this);
         } else if (type.equalsIgnoreCase("admob")) {
@@ -83,6 +84,23 @@ public class TaskActivity extends AppCompatActivity {
         } else if (type.equalsIgnoreCase("applovin")) {
             ApplovinManager.loadApplovinInterstitial(this);
         }
+    }
+
+    private void showInterstitialSafe() {
+        if (adType == null) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.showInterstitialAds(this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.showInterstitialAd(this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            ApplovinManager.showApplovinInterstitial(this);
+            ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
+        }
+
+        AppClass.getInstance(this).getAppOpenObserver().markInterstitialShown();
+        preloadInterstitial(adType);
     }
 
     private void loadTasks() {
@@ -152,20 +170,20 @@ public class TaskActivity extends AppCompatActivity {
         AppClass.getInstance(this).addToRequestQueue(request, TAG);
     }
 
-    // 🔹 Tampilkan konfirmasi biaya sebelum membuka tugas
+    // 🔹 Tampilkan konfirmasi misi tugas (diksi aman dari tuduhan gambling)
     private void showTaskConfirmationDialog(TasksModel task) {
-        String message = "<b>Untuk membuka tugas \"" + task.getTask_name() + "\"</b><br><br>" +
-                "💎 <b>Biaya:</b> " + task.getTask_cost() + " berlian<br>" +
-                "🎁 <b>Hadiah:</b> +" + task.getTask_coin() + " berlian<br>" +
-                "⏱️ <b>Durasi minimal:</b> " + task.getTask_time() + " menit<br><br>" +
-                "⛔ <b>PENTING: Biaya " + task.getTask_cost()  + " berlian akan hangus jika Anda keluar atau durasi bermain kurang dari " + task.getTask_time() + " menit</b><br><br>" +
-                "Apakah kamu ingin melanjutkan?";
+        String message = "<b>Untuk membuka misi \"" + task.getTask_name() + "\"</b><br><br>" +
+                "💎 <b>Tiket misi:</b> " + task.getTask_cost() + " berlian<br>" +
+                "⏱️ <b>Durasi minimal:</b> " + task.getTask_time() + " menit<br>" +
+                "🎁 <b>Hadiah penyelesaian:</b> +" + task.getTask_coin() + " berlian<br><br>" +
+                "⚠️ <b>Catatan: Selesaikan durasi tugas hingga selesai untuk mengklaim hadiah diamond game.</b><br><br>" +
+                "Apakah kamu ingin memulai misi ini?";
 
         new AlertDialog.Builder(this)
-                .setTitle("Konfirmasi Buka Tugas")
-                .setMessage(android.text.Html.fromHtml(message))
+                .setTitle("Konfirmasi Misi Tugas")
+                .setMessage(android.text.Html.fromHtml(message, android.text.Html.FROM_HTML_MODE_LEGACY))
                 .setCancelable(false)
-                .setPositiveButton("Lanjutkan", (dialog, which) -> {
+                .setPositiveButton("MULAI", (dialog, which) -> {
                     dialog.dismiss();
                     startTaskWithCost(task);
                 })
@@ -173,13 +191,13 @@ public class TaskActivity extends AppCompatActivity {
                 .show();
     }
 
-    // 🔹 Proses pemotongan biaya ke server sebelum membuka tugas
+    // 🔹 Proses pembukaan tugas di server
     private void startTaskWithCost(TasksModel task) {
         String userId = Methods.getData(this, Data.USER_ID);
         String url = BuildConfig.MAIN_URL + "/aapi_files/api_start_task.php?user_id=" + userId + "&task_id=" + task.getId();
 
         ProgressDialog progress = new ProgressDialog(this);
-        progress.setMessage("Memproses biaya tugas...");
+        progress.setMessage("Membuka misi tugas...");
         progress.setCancelable(false);
         progress.show();
 
@@ -230,17 +248,21 @@ public class TaskActivity extends AppCompatActivity {
         if (isTaskStarted) {
             isTaskStarted = false;
             long elapsed = System.currentTimeMillis() - startTimeMillis;
-            TasksModel task = taskList.get(currentPos);
+            if (currentPos >= 0 && currentPos < taskList.size()) {
+                TasksModel task = taskList.get(currentPos);
 
-            if (elapsed >= requiredMillis) {
-                showRewardDialog(task);
-            } else {
-                showInsufficientDialog(task, (requiredMillis - elapsed) / 1000);
+                if (elapsed >= requiredMillis) {
+                    showRewardDialog(task);
+                } else {
+                    showInsufficientDialog(task, (requiredMillis - elapsed) / 1000);
+                }
             }
         }
     }
 
     private void showRewardDialog(TasksModel task) {
+        if (isFinishing() || isDestroyed()) return;
+
         SantaCustomDialog coinDialog = new SantaCustomDialog(
                 this,
                 "cointanpaiklan",
@@ -261,32 +283,23 @@ public class TaskActivity extends AppCompatActivity {
             Methods.sendRequestToServer(TAG, this, task.getId(), getString(R.string.task_text),
                     profileBinding.userCoins, null, null);
 
-            View itemView = binding.recyclerView.getLayoutManager().findViewByPosition(currentPos);
-            if (itemView != null) {
-                itemView.setVisibility(View.GONE);
-                itemView.getLayoutParams().height = 0;
+            if (binding.recyclerView.getLayoutManager() != null) {
+                View itemView = binding.recyclerView.getLayoutManager().findViewByPosition(currentPos);
+                if (itemView != null) {
+                    itemView.setVisibility(View.GONE);
+                    itemView.getLayoutParams().height = 0;
+                }
             }
 
-            // ✅ Tampilkan interstitial
-            if (adType.equalsIgnoreCase("google_ads_manager")) {
-                AdsManager.showInterstitialAds(this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("admob")) {
-                AdmobManager.showInterstitialAd(this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("applovin")) {
-                ApplovinManager.showApplovinInterstitial(this);
-                ((AppClass) getApplication()).getAppOpenObserver().markInterstitialShown();
-            }
-
-            AppClass.getInstance(this).getAppOpenObserver().markInterstitialShown();
-            preloadInterstitial(adType);
+            showInterstitialSafe(); // Tampilkan interstitial secara aman
         });
 
         coinDialog.show();
     }
 
     private void showInsufficientDialog(TasksModel task, long remainSec) {
+        if (isFinishing() || isDestroyed()) return;
+
         SantaCustomDialog dialog = new SantaCustomDialog(
                 this,
                 "insufficient",

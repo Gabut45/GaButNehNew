@@ -1,7 +1,5 @@
-// ✅ Final HomeFragment.java - Integrasi penuh dengan AppOpenObserver
+// ✅ Final HomeFragment.java - Sesuai Aturan Google Play & AdMob
 package com.ujicoba.gabut.fragments;
-
-import static androidx.lifecycle.AndroidViewModel_androidKt.getApplication;
 
 import android.net.Uri;
 import android.os.Bundle;
@@ -44,7 +42,6 @@ import com.ujicoba.gabut.utils.AdmobManager;
 import com.ujicoba.gabut.utils.AdsManager;
 import com.ujicoba.gabut.utils.AppClass;
 import com.ujicoba.gabut.utils.ApplovinManager;
-import com.ujicoba.gabut.utils.AppOpenObserver;
 import com.ujicoba.gabut.utils.Methods;
 import com.ujicoba.gabut.utils.SantaCustomDialog;
 
@@ -61,9 +58,9 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
     private final String TAG = HomeFragment.class.getSimpleName();
     private List<HomeSliderModel> homeSliderModelList;
     private HomeSliderAdapter homeSliderAdapter;
-    private Handler homeSliderHandler = new Handler();
-    private int defaultSliderItem = 0;
-    private int homeSliderTime = 3000;
+    private final Handler homeSliderHandler = new Handler();
+    private final int defaultSliderItem = 0;
+    private final int homeSliderTime = 3000;
     private GameCategoryAdapter categoryAdapter;
     private List<GameCategory> categories;
     private List<GamesModel> gamesModelList;
@@ -84,6 +81,7 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         initClickListener();
         adType = Methods.getData(getContext(), Data.ADS_NETWORK_NAME);
         loadAds(adType);
+        preloadInterstitial(); // Preload iklan di awal agar tidak delay
         loadGames();
         return binding.getRoot();
     }
@@ -116,6 +114,7 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
     }
 
     public void loadFragment(Fragment fragment, boolean isReplace) {
+        if (!isAdded()) return;
         FragmentManager fm = requireActivity().getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
         if (isReplace) ft.replace(R.id.container, fragment);
@@ -150,7 +149,11 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         });
     }
 
-    private final Runnable homeSliderRunnable = () -> binding.viewPager2.setCurrentItem(binding.viewPager2.getCurrentItem() + 1);
+    private final Runnable homeSliderRunnable = () -> {
+        if (binding != null && binding.viewPager2 != null) {
+            binding.viewPager2.setCurrentItem(binding.viewPager2.getCurrentItem() + 1);
+        }
+    };
 
     private void getSliderItems() {
         SantaCoderJsonObjRequest sliderRequest = new SantaCoderJsonObjRequest(Request.Method.GET, BuildConfig.MAIN_URL + "/aapi_files/api_sliders.php", null, response -> {
@@ -161,7 +164,9 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
                         JSONObject sliderObj = sliderArray.getJSONObject(i);
                         homeSliderModelList.add(new HomeSliderModel(sliderObj.getString("slider_image"), sliderObj.getString("slider_link")));
                     }
-                    homeSliderAdapter.notifyDataSetChanged();
+                    if (homeSliderAdapter != null) {
+                        homeSliderAdapter.notifyDataSetChanged();
+                    }
                 }
             } catch (JSONException e) { e.printStackTrace(); }
         }, error -> Methods.showErrorResponse(TAG, error, getContext()));
@@ -208,6 +213,7 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
                             ));
                         }
 
+                        if (!isAdded()) return;
                         categoryAdapter = new GameCategoryAdapter(categories, true);
                         binding.recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
                         binding.recyclerView.setAdapter(categoryAdapter);
@@ -241,19 +247,22 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         AppClass.getInstance(getContext()).addToRequestQueue(gamesRequest, TAG);
     }
 
+    // Pop-up konfirmasi aktivasi tantangan game (diksi aman dari tuduhan gambling)
     private void showPlayConfirmationDialog(GamesModel game) {
-        String message = "Untuk memainkan <b>\"" + game.getGameName() + "\"</b><br><br>" +
-                "💎 Biaya bermain: <b>" + game.getGameCost() + " berlian</b><br>" +
-                "⏱️ Durasi minimal: <b>" + game.getGamePlayTime() + " menit</b><br>" +
-                "🎁 Hadiah jika berhasil: <b>+" + game.getGameCoin() + " berlian</b><br><br>" +
-                "⛔ <b>PENTING: Biaya <b>" + game.getGameCost() + " berlian akan hangus jika Anda keluar atau durasi bermain kurang dari " + game.getGamePlayTime() + " menit</b><br><br>" +
-                "Apakah kamu ingin melanjutkan bermain?";
+        if (!isAdded()) return;
+
+        String message = "Untuk membuka tantangan <b>\"" + game.getGameName() + "\"</b><br><br>" +
+                "💎 Tiket tantangan: <b>" + game.getGameCost() + " berlian</b><br>" +
+                "⏱️ Durasi misi: <b>" + game.getGamePlayTime() + " menit</b><br>" +
+                "🎁 Hadiah penyelesaian: <b>+" + game.getGameCoin() + " berlian</b><br><br>" +
+                "⚠️ <b>Catatan: Selesaikan durasi bermain hingga selesai untuk mendapatkan reward diamond game.</b><br><br>" +
+                "Apakah kamu ingin memulai tantangan ini?";
 
         new androidx.appcompat.app.AlertDialog.Builder(requireContext())
-                .setTitle("Konfirmasi Bermain Game")
+                .setTitle("Konfirmasi Tantangan Game")
                 .setMessage(android.text.Html.fromHtml(message, android.text.Html.FROM_HTML_MODE_LEGACY))
                 .setCancelable(false)
-                .setPositiveButton("LANJUTKAN", (dialog, which) -> {
+                .setPositiveButton("MULAI", (dialog, which) -> {
                     dialog.dismiss();
                     startGameWithCost(game);
                 })
@@ -261,13 +270,14 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
                 .show();
     }
 
-
     private void startGameWithCost(GamesModel game) {
+        if (!isAdded()) return;
+
         String userId = Methods.getData(requireContext(), Data.USER_ID);
         String url = BuildConfig.MAIN_URL + "/aapi_files/api_start_game.php?user_id=" + userId + "&game_id=" + game.getId();
 
         android.app.ProgressDialog progress = new android.app.ProgressDialog(requireContext());
-        progress.setMessage("Memproses biaya bermain...");
+        progress.setMessage("Membuka tantangan game...");
         progress.setCancelable(false);
         progress.show();
 
@@ -301,10 +311,8 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         AppClass.getInstance(requireContext()).addToRequestQueue(request, TAG);
     }
 
-
-
     private void startGame(String url) {
-        // ✅ Tandai kalau ini buka game
+        if (!isAdded()) return;
         AppClass.getInstance(requireContext()).getAppOpenObserver().markFromGame();
 
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
@@ -317,10 +325,11 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
     @Override
     public void onResume() {
         super.onResume();
+        if (!isAdded()) return;
 
         AppClass.getInstance(requireContext()).setCurrentActivity(requireActivity());
-
         homeSliderHandler.postDelayed(homeSliderRunnable, homeSliderTime);
+
         if (isGameStarted) {
             isGameStarted = false;
             long elapsedTime = System.currentTimeMillis() - gameStartTimeMillis;
@@ -332,8 +341,37 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         }
     }
 
+    private void preloadInterstitial() {
+        if (adType == null || !isAdded()) return;
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.loadInterstitialAds(requireActivity());
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.loadInterstitialAd(requireActivity());
+        }
+    }
+
+    private void showInterstitialSafe() {
+        if (adType == null || !isAdded()) return;
+
+        if (adType.equalsIgnoreCase("google_ads_manager")) {
+            AdsManager.showInterstitialAds(requireActivity());
+            ((AppClass) requireActivity().getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("admob")) {
+            AdmobManager.showInterstitialAd(requireActivity());
+            ((AppClass) requireActivity().getApplication()).getAppOpenObserver().markInterstitialShown();
+        } else if (adType.equalsIgnoreCase("applovin")) {
+            ApplovinManager.showApplovinInterstitial(requireActivity());
+            ((AppClass) requireActivity().getApplication()).getAppOpenObserver().markInterstitialShown();
+        }
+
+        AppClass.getInstance(requireContext()).getAppOpenObserver().markInterstitialShown();
+        // Siapkan iklan berikutnya
+        preloadInterstitial();
+    }
 
     private void showCoinDialog() {
+        if (!isAdded()) return;
+
         Methods.sendRequestToServer(
                 TAG,
                 getContext(),
@@ -362,48 +400,26 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
 
         coinDialog.setOnDialogButtonClickListener(() -> {
             coinDialog.dismiss();
-
-            if (adType.equalsIgnoreCase("google_ads_manager")) {
-                AdsManager.loadInterstitialAds(requireActivity());
-                AdsManager.showInterstitialAds(requireActivity());
-                ((AppClass) requireActivity().getApplication())
-                        .getAppOpenObserver()
-                        .markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("admob")) {
-                AdmobManager.loadInterstitialAd(requireActivity());
-                AdmobManager.showInterstitialAd(requireActivity());
-                ((AppClass) requireActivity().getApplication())
-                        .getAppOpenObserver()
-                        .markInterstitialShown();
-            } else if (adType.equalsIgnoreCase("applovin")) {
-                ApplovinManager.showApplovinInterstitial(requireActivity());
-                ((AppClass) requireActivity().getApplication())
-                        .getAppOpenObserver()
-                        .markInterstitialShown();
-            }
-
-            /// ❌ Jangan tampilkan Open Ads setelah interstitial
-            // ✅ tandai supaya open ads tidak muncul
-            AppClass.getInstance(requireContext()).getAppOpenObserver().markInterstitialShown();
-
+            showInterstitialSafe(); // Iklan interstitial tampil secara aman tanpa delay
             loadGames();
         });
 
         coinDialog.show();
-
     }
 
     private void showInsufficientDialog(long secondsLeft) {
+        if (!isAdded()) return;
+
         insufficentDialog = new SantaCustomDialog(
                 getContext(),
                 "insufficient",
                 1200,
                 R.drawable.ic_clock,
                 getString(R.string.text_insufficient),
-                "Mainkan, minimal " + categories.get(catPos).getGamesModelLIst().get(gamePos).getGamePlayTime() +
+                "Mainkan minimal " + categories.get(catPos).getGamesModelLIst().get(gamePos).getGamePlayTime() +
                         " menit untuk mendapatkan " +
                         categories.get(catPos).getGamesModelLIst().get(gamePos).getGameCoin() + " berlian.",
-                "Sisa waktu, kurang : " + secondsLeft + " detik",
+                "Sisa waktu kurang : " + secondsLeft + " detik",
                 getString(R.string.btn_cancel), "Ulangi Lagi", "Enter Referral Code", "null");
 
         insufficentDialog.setOnDialogButtonClickListener(() -> {
@@ -416,20 +432,26 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
     }
 
     private void loadAds(String type) {
+        if (type == null) return;
         if (type.equalsIgnoreCase("google_ads_manager")) {
             AdsManager.setAdsManagerCallback(this);
             AdsManager.initAds(getContext());
-        } else if (type.equalsIgnoreCase("admob")) {
-            // opsional: banner
         } else if (type.equalsIgnoreCase("applovin")) {
             ApplovinManager.setApplovinManagerCallback(this);
         }
     }
 
-    @Override public void onAdDismissed() {}
-    @Override public void onAdHidden() {}
+    @Override public void onAdDismissed() {
+        preloadInterstitial();
+    }
+
+    @Override public void onAdHidden() {
+        preloadInterstitial();
+    }
 
     private void dailyCheckIn(TextView userCoins) {
+        if (!isAdded()) return;
+
         JSONObject params = new JSONObject();
         try { params.put("uid", Methods.getData(getContext(), Data.USER_ID)); } catch (JSONException e) { e.printStackTrace(); }
         SantaCoderJsonObjRequest checkinRequest = new SantaCoderJsonObjRequest(Request.Method.POST, BuildConfig.MAIN_URL + "/aapi_files/api_bonus.php", params, response -> {
@@ -445,7 +467,23 @@ public class HomeFragment extends Fragment implements AdsManager.AdsManagerCallb
         AppClass.getInstance(getContext()).addToRequestQueue(checkinRequest, TAG);
     }
 
-    @Override public void onPause() { super.onPause(); homeSliderHandler.removeCallbacks(homeSliderRunnable); }
-    @Override public void onDestroy() { super.onDestroy(); binding = null; }
-    @Override public void onStop() { super.onStop(); AppClass.getInstance(getContext()).cancelPendingRequests(TAG); }
+    @Override
+    public void onPause() {
+        super.onPause();
+        homeSliderHandler.removeCallbacks(homeSliderRunnable);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        binding = null;
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (getContext() != null) {
+            AppClass.getInstance(getContext()).cancelPendingRequests(TAG);
+        }
+    }
 }

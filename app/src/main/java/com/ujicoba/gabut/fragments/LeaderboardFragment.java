@@ -189,7 +189,7 @@ public class LeaderboardFragment extends Fragment {
 
         tvDialogTitle.setText("Daftar Penerima Hadiah GRATIS");
         tvEmailInfo.setText(Html.fromHtml(
-                "Jika mengalami masalah, silahkan hubungi:<br><b>cs@gabut.com</b>",
+                "Jika mengalami masalah, silahkan hubungi:<br><b>cs@gabutgame.my.id</b>",
                 Html.FROM_HTML_MODE_LEGACY
         ));
 

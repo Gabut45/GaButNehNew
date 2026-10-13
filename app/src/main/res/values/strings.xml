@@ -2,7 +2,7 @@
     <!--    // Need To Change-->
     <string name="app_name">GaBut</string>
     <string name="client_id">821495368257-n0ab878uhrvq453nestldn0a17b0jars.apps.googleusercontent.com</string>
-    <string name="onesignal_app_id">53033e77-5b66-4237-a378-23812e82a6ed</string>
+    <!-- // <string name="onesignal_app_id">53033e77-5b66-4237-a378-23812e82a6ed</string>-->
     <!--    // Need To Change-->
 
     <!--TODO Text For Bottom Navigation Bar-->
@@ -44,7 +44,7 @@
     <string name="text_today_offers">Today Offers</string>
     <string name="text_view_all">Game Lainnya</string>
     <string name="msg_please_wait">Please Wait.</string>
-    <string name="msg_phone_state_permission">Permission required for registration.</string>
+    <!--//<string name="msg_phone_state_permission">Permission required for registration.</string>-->
     <string name="msg_no_internet">No Internet!</string>
     <string name="msg_no_internet_desc">Please check your internet connection.</string>
     <string name="no_internet_desc"><![CDATA[No Internet Connection, Please check your Internet Connection & click on the Retry button.]]></string>
