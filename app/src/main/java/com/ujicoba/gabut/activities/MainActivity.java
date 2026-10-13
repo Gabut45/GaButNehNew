@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
                 items.add(new ShowcaseItem(
                         spinView,
                         "🎰 Lucky Spin",
-                        "Spin daily for bonus coins and exciting prizes.",
+                        "Spin daily for bonus coins.",
                         4,
                         7
                 ));
@@ -269,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
                 items.add(new ShowcaseItem(
                         gameView,
                         "🎮 Play Games",
-                        "Play games to earn more rewards and extra income.",
+                        "Play games to complete challenges and earn virtual diamonds.",
                         5,
                         7
                 ));

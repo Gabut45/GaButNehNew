@@ -24,16 +24,24 @@ import com.ujicoba.gabut.api.Data;
 
 public class ApplovinManager {
 
+    private static final String TAG = "ApplovinManager";
+
     public static MaxAdView adView;
     public static MaxInterstitialAd maxInterstitialAd;
     private static MaxRewardedAd maxRewardedAd;
     private static Runnable rewardedCallback;
+    private static boolean hasUserEarnedReward = false; // ✅ Flag pencegah reward palsu
 
     /**
-     * ✅ Inisialisasi Applovin pakai SDK Key dari server (bukan Manifest)
+     * ✅ Inisialisasi Applovin pakai SDK Key dari server
      */
     public static void initApplovin(Activity activity, LinearLayout bannerLayout) {
-        String sdkKey = Methods.getData(activity, Data.AL_SDK_KEY); // 🔑 Ambil SDK Key dari server
+        String sdkKey = Methods.getData(activity, Data.AL_SDK_KEY);
+
+        if (sdkKey == null || sdkKey.trim().isEmpty()) {
+            Log.e(TAG, "SDK Key kosong, inisialisasi AppLovin dibatalkan.");
+            return;
+        }
 
         AppLovinSdkInitializationConfiguration initConfig =
                 AppLovinSdkInitializationConfiguration.builder(sdkKey, activity)
@@ -50,10 +58,17 @@ public class ApplovinManager {
     }
 
     /**
-     * ✅ Banner Ads
+     * ✅ Banner Ads (Bersih dari tumpukan view ganda)
      */
     public static void loadApplovinBanner(Context ctx, LinearLayout bannerLayout) {
-        adView = new MaxAdView(Methods.getData(ctx, Data.AL_BANNER_ID), ctx);
+        String bannerId = Methods.getData(ctx, Data.AL_BANNER_ID);
+        if (bannerId == null || bannerId.trim().isEmpty()) return;
+
+        if (adView != null) {
+            adView.destroy();
+        }
+
+        adView = new MaxAdView(bannerId, ctx);
         adView.setListener(new ApplovinBannerListener());
 
         int width = ViewGroup.LayoutParams.MATCH_PARENT;
@@ -61,6 +76,7 @@ public class ApplovinManager {
         final int heightPx = AppLovinSdkUtils.dpToPx(ctx, isTablet ? 90 : 50);
 
         adView.setLayoutParams(new FrameLayout.LayoutParams(width, heightPx, Gravity.BOTTOM));
+        bannerLayout.removeAllViews(); // ✅ Cegah view bertumpuk
         bannerLayout.addView(adView);
 
         adView.loadAd();
@@ -72,52 +88,70 @@ public class ApplovinManager {
      * ✅ Interstitial Ads
      */
     public static void loadApplovinInterstitial(Activity activity) {
-        maxInterstitialAd = new MaxInterstitialAd(Methods.getData(activity, Data.AL_INTERSTITIAL_ID), activity);
-        maxInterstitialAd.setListener(new ApplovinInterstitialListener());
+        String interstitialId = Methods.getData(activity, Data.AL_INTERSTITIAL_ID);
+        if (interstitialId == null || interstitialId.trim().isEmpty()) return;
+
+        maxInterstitialAd = new MaxInterstitialAd(interstitialId, activity);
+        maxInterstitialAd.setListener(new ApplovinInterstitialListener(activity));
         maxInterstitialAd.loadAd();
     }
 
     public static void showApplovinInterstitial(Activity activity) {
         if (maxInterstitialAd != null && maxInterstitialAd.isReady()) {
-            maxInterstitialAd.showAd();
+            maxInterstitialAd.showAd(activity); // ✅ Kirim activity aktif
         } else {
             loadApplovinInterstitial(activity);
         }
     }
 
     /**
-     * ✅ Rewarded Ads
+     * ✅ Rewarded Ads (Aman dari kecurangan skip iklan)
      */
     public static void loadApplovinRewarded(Activity activity) {
-        maxRewardedAd = MaxRewardedAd.getInstance(Methods.getData(activity, Data.AL_REWARDED_ID), activity);
+        String rewardedId = Methods.getData(activity, Data.AL_REWARDED_ID);
+        if (rewardedId == null || rewardedId.trim().isEmpty()) return;
+
+        maxRewardedAd = MaxRewardedAd.getInstance(rewardedId, activity);
+        hasUserEarnedReward = false;
 
         maxRewardedAd.setListener(new MaxRewardedAdListener() {
-            @Override public void onAdLoaded(MaxAd ad) { }
-            @Override public void onAdDisplayed(MaxAd ad) { }
+            @Override public void onAdLoaded(MaxAd ad) {
+                Log.d(TAG, "Rewarded ad ready.");
+            }
+
+            @Override public void onAdDisplayed(MaxAd ad) {
+                hasUserEarnedReward = false; // Reset saat mulai tayang
+            }
 
             @Override
             public void onAdHidden(MaxAd ad) {
-                if (rewardedCallback != null) {
+                // ✅ Hadiah HANYA dicairkan jika user benar-benar menonton sampai tuntas
+                if (hasUserEarnedReward && rewardedCallback != null) {
                     rewardedCallback.run();
-                    rewardedCallback = null;
                 }
-                loadApplovinRewarded(activity); // Reload iklan baru
+                rewardedCallback = null;
+                hasUserEarnedReward = false;
+                loadApplovinRewarded(activity); // Siapkan iklan baru
             }
 
             @Override public void onAdClicked(MaxAd ad) { }
+
             @Override public void onAdLoadFailed(String adUnitId, MaxError error) {
-                Log.e("Applovin", "Rewarded load failed: " + error.getMessage());
+                Log.e(TAG, "Rewarded load failed: " + error.getMessage());
+                // ✅ JANGAN load ulang instan di sini untuk mencegah loop spam
             }
+
             @Override public void onAdDisplayFailed(MaxAd ad, MaxError error) {
-                Log.e("Applovin", "Rewarded display failed: " + error.getMessage());
+                Log.e(TAG, "Rewarded display failed: " + error.getMessage());
+                hasUserEarnedReward = false;
+                rewardedCallback = null;
+                loadApplovinRewarded(activity);
             }
 
             @Override
             public void onUserRewarded(MaxAd ad, MaxReward reward) {
-                if (rewardedCallback != null) {
-                    rewardedCallback.run();
-                    rewardedCallback = null;
-                }
+                // ✅ User resmi menyelesaikan video iklan
+                hasUserEarnedReward = true;
             }
         });
 
@@ -127,9 +161,10 @@ public class ApplovinManager {
     public static void showRewardedAd(Activity activity, Runnable onRewarded) {
         if (maxRewardedAd != null && maxRewardedAd.isReady()) {
             rewardedCallback = onRewarded;
-            maxRewardedAd.showAd();
+            hasUserEarnedReward = false;
+            maxRewardedAd.showAd(activity); // ✅ Kirim activity aktif
         } else {
-            Log.d("Applovin", "Rewarded ad not ready");
+            Log.d(TAG, "Rewarded ad not ready");
             loadApplovinRewarded(activity);
             Methods.showToast(activity, "Iklan belum siap, coba lagi nanti.");
         }
@@ -140,20 +175,43 @@ public class ApplovinManager {
     }
 
     /**
-     * ✅ Listener untuk Interstitial
+     * ✅ Listener untuk Interstitial (Bebas dari infinite loop spam)
      */
     public static class ApplovinInterstitialListener implements com.applovin.mediation.MaxAdListener {
-        @Override public void onAdLoaded(MaxAd ad) { Log.i("Applovin", "Interstitial loaded"); }
+        private final Activity activity;
+
+        public ApplovinInterstitialListener(Activity activity) {
+            this.activity = activity;
+        }
+
+        @Override public void onAdLoaded(MaxAd ad) {
+            Log.i(TAG, "Interstitial loaded");
+        }
+
         @Override public void onAdDisplayed(MaxAd ad) {}
+
         @Override public void onAdHidden(MaxAd ad) {
-            maxInterstitialAd.loadAd();
+            if (maxInterstitialAd != null) {
+                maxInterstitialAd.loadAd();
+            }
             if (applovinManagerCallback != null) {
                 applovinManagerCallback.onAdHidden();
             }
         }
+
         @Override public void onAdClicked(MaxAd ad) {}
-        @Override public void onAdLoadFailed(String adUnitId, MaxError error) { maxInterstitialAd.loadAd(); }
-        @Override public void onAdDisplayFailed(MaxAd ad, MaxError error) { maxInterstitialAd.loadAd(); }
+
+        @Override public void onAdLoadFailed(String adUnitId, MaxError error) {
+            Log.e(TAG, "Interstitial load failed: " + error.getMessage());
+            // ✅ Tidak memanggil loadAd() lagi di sini agar tidak looping spam request
+        }
+
+        @Override public void onAdDisplayFailed(MaxAd ad, MaxError error) {
+            Log.e(TAG, "Interstitial display failed: " + error.getMessage());
+            if (maxInterstitialAd != null) {
+                maxInterstitialAd.loadAd();
+            }
+        }
     }
 
     /**
@@ -162,11 +220,13 @@ public class ApplovinManager {
     public static class ApplovinBannerListener implements MaxAdViewAdListener {
         @Override public void onAdExpanded(MaxAd ad) {}
         @Override public void onAdCollapsed(MaxAd ad) {}
-        @Override public void onAdLoaded(MaxAd ad) { Log.i("Applovin", "Banner loaded"); }
+        @Override public void onAdLoaded(MaxAd ad) { Log.i(TAG, "Banner loaded"); }
         @Override public void onAdDisplayed(MaxAd ad) {}
         @Override public void onAdHidden(MaxAd ad) {}
         @Override public void onAdClicked(MaxAd ad) {}
-        @Override public void onAdLoadFailed(String adUnitId, MaxError error) {}
+        @Override public void onAdLoadFailed(String adUnitId, MaxError error) {
+            Log.e(TAG, "Banner load failed: " + error.getMessage());
+        }
         @Override public void onAdDisplayFailed(MaxAd ad, MaxError error) {}
     }
 

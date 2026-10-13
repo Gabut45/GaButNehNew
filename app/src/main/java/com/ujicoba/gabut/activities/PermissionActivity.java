@@ -87,7 +87,7 @@ public class PermissionActivity extends AppCompatActivity {
     private void showPermissionDeniedDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("Ketidakcocokan Pilihan")
-                .setMessage("kamu sebelumnya sudah klik SETUJU, Kenapa sekarang pilih JANGAN IZINKAN. Jika kamu pilih JANGAN IZINKAN, maka pilihlah LEWATI.")
+                .setMessage("Izin notifikasi belum diaktifkan. Anda tetap dapat melanjutkan, namun Anda mungkin tidak akan menerima pemberitahuan mengenai status hadiah atau penukaran berlian.")
                 .setPositiveButton("OK", (dialog, which) -> dialog.dismiss())
                 .show();
     }
