@@ -18,6 +18,10 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         buildConfigField("String", "MAIN_URL", "\"${baseUrl}\"")
         buildConfigField("String", "SECRET_KEY", "\"${apiKey}\"")
+        manifestPlaceholders = [
+                admobAppId: project.findProperty("admobAppId") ?: "ca-app-pub-3940256854942544~3344561713",
+                applovinSdkKey: project.findProperty("applovinSdkKey") ?: "lCed4bgf8m9W0EaHrx-MlZmfao0sHHZp6XxqFAu7wUfFdmw0kW6CQlnVpsqegHoM7xld674VsEzraMyl6KoGym"
+        ]
     }
 
     buildTypes {

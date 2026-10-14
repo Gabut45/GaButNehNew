@@ -96,10 +96,10 @@
 
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256854942544~3344561713" />
+            android:value="${admobAppId}" />
         <meta-data
             android:name="applovin.sdk.key"
-            android:value="lCed4bgf8m9W0EaHrx-MlZmfao0sHHZp6XxqFAu7wUfFdmw0kW6CQlnVpsqegHoM7xld674VsEzraMyl6KoGym" />
+            android:value="${applovinSdkKey}" />
     </application>
 
 

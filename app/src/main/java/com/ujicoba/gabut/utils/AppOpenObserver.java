@@ -12,7 +12,8 @@ import com.ujicoba.gabut.activities.SplashActivity;
 
 public class AppOpenObserver implements Application.ActivityLifecycleCallbacks {
 
-    private static final long MIN_BACKGROUND_DURATION = 5_000; // 120 detik (2 menit)
+    private static final long MIN_BACKGROUND_DURATION = 120_000; // 120 detik (2 menit)
+    private static final long ADS_FREQUENCY_CAP_MS = 240_000;
     private static volatile AppOpenObserver instance;
 
     private long lastBackgroundTime = 0;
